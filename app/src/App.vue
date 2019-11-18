@@ -1,60 +1,59 @@
 <template>
   <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
+    <v-app-bar app dark color="blue-grey darken-1">
+      <h2 class="d-flex display-1">LexicalAnalyzer</h2>
 
       <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+      
+      <v-btn text href="https://github.com/joao-vieira/URI.CS16.LexicalAnalyzer" target="_blank">
+        <span class="mr-2">REPOSITÓRIO</span>
+        <v-icon>mdi-github-circle</v-icon>
+      </v-btn>
+      <v-btn text href="https://github.com/joao-vieira" target="_blank">
+        <span class="mr-2">PERFIL</span>
+        <v-icon>mdi-github-face</v-icon>
+      </v-btn>
+      <v-btn @click="overlay = !overlay" text>
+        <span class="mr-2">AJUDA</span>
+        <v-icon>mdi-help</v-icon>
       </v-btn>
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <v-overlay :absolute="true" :value="overlay" opacity="0.7">
+        <h1 class="display-4">LexicalAnalyzer HELP!</h1>
+      </v-overlay>
+
+      <v-container fluid>
+        <v-row>
+          <v-col cols="12">
+            <Token :tokenMaxLength="tokenMaxLength" />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <StateTable :tokenMaxLength="tokenMaxLength" />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import Token from './components/Token';
+import StateTable from './components/StateTable';
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld,
+    StateTable, Token
   },
 
   data: () => ({
-    //
+    overlay: false,
+    tokenMaxLength: 30,
   }),
 };
 </script>
