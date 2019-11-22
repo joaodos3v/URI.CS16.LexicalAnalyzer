@@ -6,9 +6,6 @@
       <HeaderButtons />
     </v-app-bar>
     <v-content>
-      <v-overlay :absolute="true" :value="overlay" opacity="0.7">
-        <h1 class="display-4">LexicalAnalyzer HELP!</h1>
-      </v-overlay>
       <v-container fluid>
         <v-row>
           <v-col cols="12">
@@ -18,7 +15,9 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <StateTable :automaton="automaton" :tokenMaxLength="tokenMaxLength" />
+            <StateTable :automaton="automaton" :tokenMaxLength="tokenMaxLength"
+              :tokenIsValid="tokenIsValid" :tokenIsNonFinal="tokenIsNonFinal"
+              @validate="validateToken" />
           </v-col>
         </v-row>
       </v-container>
@@ -30,6 +29,7 @@
 import HeaderButtons from "@/components/layout/HeaderButtons";
 import TokenCard from "./components/TokenCard";
 import StateTable from "./components/StateTable";
+import Bus from "@/Bus.js";
 
 export default {
   name: 'App',
@@ -38,11 +38,18 @@ export default {
     HeaderButtons, StateTable, TokenCard
   },
 
+  created() {
+    Bus.onTokenValidate(obj => {
+      this.validateToken(obj);
+    });
+  },
+
   data: () => ({
-    overlay: false,
     tokenMaxLength: 30,
     tokens: [],
-    automaton: [],
+    tokenIsValid: false,
+    tokenIsNonFinal: true,
+    automaton: {},
     attempts: []
   }),
 
@@ -53,10 +60,49 @@ export default {
     deleteToken(i) {
       this.tokens.splice(i, 1);
     },
+    validateToken(obj) {
+      if (!obj || ('token' in obj && obj.token == "")) {
+        this._setTokenAs("nonFinal", false);
+        return;
+      }
+
+      const { token, save } = obj;
+      const states = this.automaton.body;
+      const characters = token.split("");
+      const firstCharacter = characters[0];
+      const initialState = "q0";
+      
+      if (Object.keys(states[initialState]).includes(firstCharacter)) {
+        let currentState = initialState;
+        let char = firstCharacter
+        for (let i = 0; i < characters.length; i++) {
+          const nextState = states[currentState][char];
+          if (!nextState) {
+            this._setTokenAs("invalid", save, token);
+            return;
+          }
+          currentState = nextState;
+          char = characters[i + 1];
+        }
+
+        if (states[currentState].includes("-")) {
+          this._setTokenAs("valid", save, token);
+        } else {
+          this._setTokenAs("nonFinal", save, token);
+        }
+      } else {
+        this._setTokenAs("invalid", save, token);
+      }
+    },
     _buildAutomaton() {
       const alphabet = this._getAlphabet();
       const rows = this._getRows(alphabet);
-      window.console.log(alphabet, rows);
+
+      this.automaton = [];
+      this.automaton = {
+        header: alphabet,
+        body: rows,
+      };
     },
     _getAlphabet() {
       let alphabet = [];
@@ -85,7 +131,6 @@ export default {
           for (let i = 0; i < characters.length; i++) {
             const nextState = automaton[currentState][char];
             if (!nextState) {
-              window.console.log(`===>>> A trilha deve ser criada para ${token}: Estado atual: ${currentState} | Caracter atual: ${char}`, automaton);
               const nextStateNumber = this._defineNextState(automaton);
               automaton[currentState][char] = `q${nextStateNumber}`;
               const newStates = this._generateNewStates(alphabet.length, token, i, nextStateNumber);
@@ -106,7 +151,6 @@ export default {
         }
       });
 
-      window.console.log("=> Autômato Final", automaton);
       return automaton;
     },
     _defineNextState(currentAutomaton) {
@@ -128,9 +172,47 @@ export default {
       });
       newStates[`q${currentStateNumber}`] = Array(numberOfColumns).fill("-");
 
-      window.console.log(`Novos estados gerados para ${currentToken}! `, newStates);
       return newStates;
-    }
+    },
+    _setTokenAs(state, save, token = null) {
+      let valid = true;
+      let nonFinal = false;
+      let messageClass = "success";
+      if (state === "nonFinal") {
+        valid = false;
+        nonFinal = true;
+        messageClass = "info";
+      } else if (state === "invalid") {
+        valid = false;
+        messageClass = "error";
+      }
+      
+      this.tokenIsValid = valid;
+      this.tokenIsNonFinal = nonFinal;
+      if (save) {
+        this._showToasted(messageClass);
+        this.attempts.push({token, valid, nonFinal});
+      }
+    },
+    _showToasted(type) {
+      let text = "Token em Estado Não-Final!";
+      let icon = "mdi-alert-circle";
+      
+      if (type === "error") {
+        text = "Token Inválido!";
+        icon = "mdi-close-circle";
+      } else if (type === "success") {
+        text = "Token Válido!";
+        icon = "mdi-check-circle";
+      }
+
+      this.$toasted.show(text, {
+        type: type,
+        icon: icon
+      });
+
+      this._setTokenAs("nonFinal", false);
+    },
   },
 
   watch: {

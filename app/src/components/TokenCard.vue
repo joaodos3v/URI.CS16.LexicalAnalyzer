@@ -30,60 +30,32 @@
           </v-container>
         </v-tab-item>
 
-
-        <v-tab>TOKENS VALIDADOS</v-tab>
-        <v-tab-item>
-          <v-container fluid>
-            <v-row>
-              <v-col cols="6">
-                <v-card>
-                  <v-card-title><h4>Válidos</h4></v-card-title>
-                  <v-divider></v-divider>
-                  <v-list dense>
-                    <v-list-item>
-                      <v-list-item-content class="body-1">Cadeira</v-list-item-content>
-                      <v-list-item-content class="align-end">
-                        <v-chip color="teal lighten-2" text-color="white">
-                          <v-avatar left>
-                            <v-icon>mdi-checkbox-marked-circle</v-icon>
-                          </v-avatar>
-                          Aceito
-                        </v-chip>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                </v-card>
-              </v-col>
-              <v-col cols="6">
-                <v-card>
-                  <v-card-title><h4>Inválidos</h4></v-card-title>
-                  <v-divider></v-divider>
-                  <v-list dense>
-                    <v-list-item>
-                      <v-list-item-content class="body-1">Cadeira</v-list-item-content>
-                      <v-list-item-content class="align-end">
-                        <v-chip color="red lighten-2" text-color="white">
-                          <v-avatar left>
-                            <v-icon>mdi-close-circle</v-icon>
-                          </v-avatar>
-                          Rejeitado
-                        </v-chip>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-tab-item>
+        <template v-if="attempts.length">
+          <v-tab>TOKENS VALIDADOS</v-tab>
+          <v-tab-item>
+            <v-container fluid>
+              <v-row>
+                <TokenHistory title="Válidos" :list="validTokens" />
+                <TokenHistory title="Não-Finais" :list="invalidTokens" />
+                <TokenHistory title="Inválidos" :list="nonFinalTokens" />
+              </v-row>
+            </v-container>
+          </v-tab-item>
+        </template>
       </v-tabs>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
+import TokenHistory from "@/components/TokenHistory";
+
 export default {
-  name: 'Token',
+  name: 'TokenCark',
+
+  components: {
+    TokenHistory
+  },
 
   props: {
     tokenMaxLength: {
@@ -100,19 +72,23 @@ export default {
   data: () => ({
     newToken: ""
   }),
+
+  computed: {
+    validTokens() {
+      return this.attempts.filter(a => a.valid);
+    },
+    nonFinalTokens() {
+      return this.attempts.filter(a => !a.valid && a.nonFinal);
+    },
+    invalidTokens() {
+      return this.attempts.filter(a => !a.valid && !a.nonFinal);
+    },
+  },
   
   methods: {
     add() {
       this.$emit("tokenAdded", this.newToken);
       this.newToken = "";
-    },
-    validToken() {
-      // TODO: validar o token informado com uma regex
-        /**
-         * - não pode ter acento
-         * - tem que ter, NO MÍNIMO, 5 símbolos
-         * - [OK] não pode ter espaço
-         */
     }
   }
 };
