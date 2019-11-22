@@ -1,5 +1,5 @@
 <template>
-  <v-card v-if="automaton.header" :shaped="true">
+  <v-card v-if="automaton.header && automaton.header.length" :shaped="true">
     <v-card-title>Tabela de Estados</v-card-title>
     <v-card-text>
       <v-container fluid>
@@ -41,7 +41,12 @@
                     </template>
                     <template v-else>
                       <td class="title">{{ key }}</td>
-                      <td v-for="index in automaton.header" :key="index" class="text-center subtitle-1 cell-border">
+                      <td v-for="index in automaton.header" :key="index"
+                        :class="[
+                          {highlight: key == follow.currentState || index == follow.currentColumn},
+                          {focus: key == follow.currentState && index == follow.currentColumn},
+                        ]"
+                        class="text-center subtitle-1 cell-border">
                         {{ row[index] ? row[index] : "" }}
                       </td>
                     </template>
@@ -79,6 +84,7 @@ export default {
     },
     tokenIsValid: Boolean,
     tokenIsNonFinal: Boolean,
+    follow: Object,
     tokenMaxLength: {
       type: Number,
       default: 30
@@ -91,5 +97,13 @@ export default {
 <style>
 .cell-border {
   border-left: 1px solid #CCC;
+}
+
+.highlight {
+  background-color: #e3e6e6;
+}
+
+.focus {
+  background-color: #abafaf;
 }
 </style>

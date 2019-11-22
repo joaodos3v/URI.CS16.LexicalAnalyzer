@@ -16,8 +16,7 @@
         <v-row>
           <v-col cols="12">
             <StateTable :automaton="automaton" :tokenMaxLength="tokenMaxLength"
-              :tokenIsValid="tokenIsValid" :tokenIsNonFinal="tokenIsNonFinal"
-              @validate="validateToken" />
+              :tokenIsValid="tokenIsValid" :tokenIsNonFinal="tokenIsNonFinal" :follow="follow"  />
           </v-col>
         </v-row>
       </v-container>
@@ -50,7 +49,11 @@ export default {
     tokenIsValid: false,
     tokenIsNonFinal: true,
     automaton: {},
-    attempts: []
+    attempts: [],
+    follow: {
+      currentState: null,
+      currentColumn: null
+    },
   }),
 
   methods: {
@@ -74,9 +77,10 @@ export default {
       
       if (Object.keys(states[initialState]).includes(firstCharacter)) {
         let currentState = initialState;
-        let char = firstCharacter
+        let char = firstCharacter;
         for (let i = 0; i < characters.length; i++) {
           const nextState = states[currentState][char];
+          this.follow = {currentState: currentState, currentColumn: char};
           if (!nextState) {
             this._setTokenAs("invalid", save, token);
             return;
@@ -190,8 +194,8 @@ export default {
       this.tokenIsValid = valid;
       this.tokenIsNonFinal = nonFinal;
       if (save) {
-        this._showToasted(messageClass);
         this.attempts.push({token, valid, nonFinal});
+        this._showToasted(messageClass);
       }
     },
     _showToasted(type) {
@@ -211,6 +215,7 @@ export default {
         icon: icon
       });
 
+      this.follow = {currentState: null, currentColumn: null};
       this._setTokenAs("nonFinal", false);
     },
   },
