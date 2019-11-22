@@ -3,36 +3,37 @@
     <v-card-title>Tokens</v-card-title>
     <v-card-text>
       <v-tabs :grow="true">
-        <v-tab>NOVO TOKEN</v-tab>
+        <v-tab>DICIONÁRIO DA FERRAMENTA</v-tab>
         <v-tab-item>
-          <v-container>
+          <v-container fluid>
             <v-row>
               <v-col cols="6">
-                <v-row class="align-center">
-                  <v-col cols="12">
-                    <v-text-field
-                      label="Diite o novo token aqui"
-                      hint="Para adicionar, clique Enter!"
-                      :counter="tokenMaxLength"
-                      required
-                      clearable
-                      color="blue-grey darken-1"
-                      outlined
-                      shaped
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+                <v-text-field required clearable outlined shaped :counter="tokenMaxLength"
+                  label="Digite o novo token aqui"
+                  hint="Para adicionar, clique Espaço!"
+                  color="blue-grey darken-1"
+                  v-model="newToken" @keydown.space.prevent="add"
+                ></v-text-field>
               </v-col>
               <v-col cols="6">
-                aqui vai um v-chip com os tokens inseridos (v-group)
+                <v-chip-group v-if="tokens.length" column dark>
+                  <v-chip v-for="(token, i) in tokens" :key="i" large pill class="ma-2"
+                    text-color="white" color="blue-grey darken-1"
+                    close close-icon="mdi-delete" @click:close="$emit('tokenDeleted', i)"
+                  >
+                    {{ token }}
+                  </v-chip>
+                </v-chip-group>
+                <p v-else class="text-center">Por favor, informe um token para visualizar o funcionamento!</p>
               </v-col>
             </v-row>
           </v-container>
         </v-tab-item>
 
+
         <v-tab>TOKENS VALIDADOS</v-tab>
         <v-tab-item>
-          <v-container>
+          <v-container fluid>
             <v-row>
               <v-col cols="6">
                 <v-card>
@@ -84,12 +85,35 @@
 export default {
   name: 'Token',
 
-  data: () => ({
-    // 
-  }),
-
   props: {
-    tokenMaxLength: Number,
+    tokenMaxLength: {
+      type: Number,
+      default: 30
+    },
+    tokens: {
+      type: Array,
+      required: true
+    },
+    attempts: Array,
   },
+
+  data: () => ({
+    newToken: ""
+  }),
+  
+  methods: {
+    add() {
+      this.$emit("tokenAdded", this.newToken);
+      this.newToken = "";
+    },
+    validToken() {
+      // TODO: validar o token informado com uma regex
+        /**
+         * - não pode ter acento
+         * - tem que ter, NO MÍNIMO, 5 símbolos
+         * - [OK] não pode ter espaço
+         */
+    }
+  }
 };
 </script>

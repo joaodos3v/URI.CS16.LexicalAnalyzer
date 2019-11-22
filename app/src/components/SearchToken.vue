@@ -1,6 +1,7 @@
 <template>
   <v-text-field
     label="Digite o token que deseja validar"
+    hint="Para validar, clique Espaço!"
     :counter="tokenMaxLength"
     clearable
     color="blue-grey darken-1"
