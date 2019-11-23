@@ -16,7 +16,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="dialog = false">
-                Eu entendi
+                Entendi
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -67,9 +67,9 @@ export default {
   computed: {
     help() {
       const arrHelp = {
-        "Válidos": "São todos aqueles token que foram digitados corretamente e possuíam um 'caminho válido' dentro da tabela de estados. Sendo assim, todos eles foram RECONHECIDOS e ACEITOS pelo autômato!",
+        "Válidos": "São todos aqueles tokens que foram digitados corretamente e possuíam um 'caminho válido' dentro da tabela de estados. Sendo assim, todos eles foram RECONHECIDOS e ACEITOS pelo autômato!",
         "Não-Finais": "São os tokens que poderiam ter sido reconhecidos, pois estavam sendo digitados corretamente (ex.: pal -> palavra). Porém, o usuário tentou realizar sua validação antes dele se encontrar em um ESTADO FINAL. Por isso, ele foi rejeitado!",
-        "Inválidos": "Os tokens que não foram reconhecidos pelo autômato, ou seja, não possuem um 'caminho' dentro da tabela de estados.",
+        "Inválidos": "Os tokens que não foram reconhecidos pelo autômato, ou seja, não possuem um 'caminho válido' dentro da tabela de estados.",
       };
 
       return arrHelp[this.title];
