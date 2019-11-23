@@ -129,6 +129,7 @@ export default {
         const firstCharacter = characters[0];
         const initialState = "q0";
 
+        // Se a primeira letra da palavra já existe em q0, eu preciso identificar em que momento os novos estados devem ser criados e onde é esse "ponto de ligação" entre o autômato atual e os novos estados.
         if (Object.keys(automaton[initialState]).includes(firstCharacter)) {
           let char = firstCharacter
           let currentState = initialState;
@@ -146,7 +147,7 @@ export default {
             char = characters[i + 1];
             currentState = nextState;
           }
-        } else {
+        } else { // Se a primeira letra não existe em q0, o próprio q0 é a ligação e basta gerar os novos estados.
           const nextStateNumber = this._defineNextState(automaton);
           automaton[initialState][firstCharacter] = `q${nextStateNumber}`;
           const newStates = this._generateNewStates(alphabet.length, token, 0, nextStateNumber);

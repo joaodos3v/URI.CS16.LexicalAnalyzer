@@ -8,7 +8,7 @@
           <v-container fluid>
             <v-row>
               <v-col cols="6">
-                <v-text-field required clearable outlined shaped :counter="tokenMaxLength"
+                <v-text-field required clearable outlined shaped :counter="tokenMaxLength" :maxLength="tokenMaxLength"
                   label="Digite o novo token aqui"
                   hint="Para adicionar, clique Espaço!"
                   color="blue-grey darken-1"
@@ -36,8 +36,8 @@
             <v-container fluid>
               <v-row>
                 <TokenHistory title="Válidos" :list="validTokens" />
-                <TokenHistory title="Não-Finais" :list="invalidTokens" />
-                <TokenHistory title="Inválidos" :list="nonFinalTokens" />
+                <TokenHistory title="Não-Finais" :list="nonFinalTokens" />
+                <TokenHistory title="Inválidos" :list="invalidTokens" />
               </v-row>
             </v-container>
           </v-tab-item>

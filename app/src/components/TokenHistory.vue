@@ -1,8 +1,26 @@
 <template>
   <v-col cols="4">
     <v-card>
-      <v-card-title>
+      <v-card-title class="d-flex justify-space-between">
         <h4>{{ title }}</h4>
+        <v-dialog v-model="dialog" width="500" >
+          <template v-slot:activator="{ on }">
+            <v-btn fab outlined small v-on="on">
+              <v-icon>mdi-help</v-icon>
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="headline grey lighten-2" primary-title>O que são?</v-card-title>
+            <v-card-text>{{ help }}</v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="dialog = false">
+                Eu entendi
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-card-title>
       <v-divider></v-divider>
       <v-list dense>
@@ -33,7 +51,7 @@
 
 <script>
 export default {
-  name: "TokenCark",
+  name: "TokenCard",
 
   props: {
     title: {
@@ -45,5 +63,21 @@ export default {
       required: true
     }
   },
+
+  computed: {
+    help() {
+      const arrHelp = {
+        "Válidos": "São todos aqueles token que foram digitados corretamente e possuíam um 'caminho válido' dentro da tabela de estados. Sendo assim, todos eles foram RECONHECIDOS e ACEITOS pelo autômato!",
+        "Não-Finais": "São os tokens que poderiam ter sido reconhecidos, pois estavam sendo digitados corretamente (ex.: pal -> palavra). Porém, o usuário tentou realizar sua validação antes dele se encontrar em um ESTADO FINAL. Por isso, ele foi rejeitado!",
+        "Inválidos": "Os tokens que não foram reconhecidos pelo autômato, ou seja, não possuem um 'caminho' dentro da tabela de estados.",
+      };
+
+      return arrHelp[this.title];
+    }
+  },
+
+  data: () => ({
+    dialog: false
+  }),
 };
 </script>
