@@ -32,24 +32,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(row, key) in automaton.body" :key="key">
-                    <template v-if="row.includes('-')">
-                      <td class="title">* {{ key }}</td>
-                      <td v-for="(dash, i) in row" :key="i" class="text-center subtitle-1 cell-border">
-                        {{ dash }}
-                      </td>
-                    </template>
-                    <template v-else>
-                      <td class="title">{{ key }}</td>
-                      <td v-for="index in automaton.header" :key="index"
-                        :class="[
-                          {highlight: key == follow.currentState || index == follow.currentColumn},
-                          {focus: key == follow.currentState && index == follow.currentColumn},
-                        ]"
-                        class="text-center subtitle-1 cell-border">
-                        {{ row[index] ? row[index] : "" }}
-                      </td>
-                    </template>
+                  <tr v-for="(row, state) in automaton.body" :key="state">
+                    <td class="title">{{ row.includes('-') ? `* ${state}` : state }}</td>
+                    <td v-for="(column, i) in automaton.header" :key="column"
+                      :class="[
+                        {highlight: state == follow.currentState || column == follow.currentColumn},
+                        {focus: state == follow.currentState && column == follow.currentColumn},
+                      ]"
+                      class="text-center subtitle-1 cell-border">
+                      <span v-if="row.includes('-')">{{ row[column] ? row[column] : row[i] }}</span>
+                      <span v-else>{{ row[column] ? row[column] : "" }}</span>
+                    </td>
                   </tr>
                 </tbody>
               </template>
